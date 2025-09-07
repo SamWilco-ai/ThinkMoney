@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>supermarket: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">thinkmoney.com/supermarketsimulator/supermarket/supermarket.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package supermarket
+
+import (
+        "errors"
+)
+
+type ICheckout interface {
+        Scan(SKU string) error
+        GetTotalPrice() (int, error)
+}
+
+// the struct holding our information of price, special price and the threshold to achieve the special
+type Pricing struct {
+        UnitPrice     int
+        MagicQuantity int
+        MagicPrice    int
+}
+
+// the struct to implement our interface
+type Checkout struct {
+        Prices map[string]Pricing
+        Cart   map[string]int
+}
+
+// the function to create our pointer of the checkout containing known prices and the object we posess(?) at that point
+func NewCheckout(prices map[string]Pricing) *Checkout <span class="cov8" title="1">{
+        return &amp;Checkout{
+                Prices: prices,
+                Cart:   make(map[string]int),
+        }
+}</span>
+
+// the function of our checkout type to satisfy the interface for scanning the items to see if they match what we know
+func (c *Checkout) Scan(SKU string) error <span class="cov8" title="1">{
+        // check to see if the SKU we're being provided exists in our known map of prices
+        if _, ok := c.Prices[SKU]; !ok </span><span class="cov8" title="1">{
+                return errors.New("unexpected item in the bagging area")
+        }</span>
+        // if it does exist increment the quantity
+        <span class="cov8" title="1">c.Cart[SKU]++
+        return nil</span>
+}
+
+// the function of our checkout type to satisfy the interface to calculate the total price
+func (c *Checkout) GetTotalPrice() (int, error) <span class="cov8" title="1">{
+        totalPrice := 0
+
+        // range over every item in our SKU and the alligning quantity in our cart
+        for SKU, count := range c.Cart </span><span class="cov8" title="1">{
+
+                // get the prices, no need for an exists check as this is done in the scan function
+                price := c.Prices[SKU]
+
+                // if there is a "magic quantity" then we need to take it into consideration when calculating
+                if price.MagicQuantity &gt; 0 </span><span class="cov8" title="1">{
+                        // get num of full specials that could be applied
+                        discountedProductsPrice := price.MagicPrice * (count / price.MagicQuantity)
+
+                        //get the remainder to apply singular unit pricing to
+                        fullPriceProductsPrice := price.UnitPrice * (count % price.MagicQuantity)
+
+                        // add it all
+                        totalPrice += discountedProductsPrice + fullPriceProductsPrice
+                }</span> else<span class="cov8" title="1"> {
+                        totalPrice += count * price.UnitPrice
+                }</span>
+
+        }
+        <span class="cov8" title="1">return totalPrice, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
