@@ -1,0 +1,5 @@
+## Delve Debugger Creates exe file
+*.exe
+
+## Generated run json file
+.vscode

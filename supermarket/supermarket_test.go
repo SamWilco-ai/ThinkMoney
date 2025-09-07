@@ -2,6 +2,6 @@ package supermarket
 
 import "testing"
 
-func TestSuperMa(t *testing.T) {
+func TestSuperMarket(t *testing.T) {
 
 }
